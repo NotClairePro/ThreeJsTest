@@ -13,8 +13,8 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 
-const geometry = new THREE.BoxGeometry();
-const material = new THREE.MeshBasicMaterial( {color: 0x58CAA1} );
+const geometry = new THREE.PlaneGeometry();
+const material = new THREE.MeshBasicMaterial( {color: 0x58CAA1, side: THREE.DoubleSide} );
 /*
 const cube = new THREE.Mesh( geometry, material );
 const cube2 = new THREE.Mesh( geometry, material );
