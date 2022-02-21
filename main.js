@@ -20,13 +20,13 @@ const cube = new THREE.Mesh( geometry, material );
 const cube2 = new THREE.Mesh( geometry, material );
 cube2.position.set(1, 0, 0)
 */
-const group = new THREE.Group();
+const mainGroup = new THREE.Group();
 /*
 group.add(cube);
 group.add(cube2);
 */
 
-scene.add( group );
+scene.add( mainGroup );
 
 
 camera.position.z = 50;
@@ -53,7 +53,7 @@ window.addEventListener( 'resize', function () {
 const vec = new THREE.Vector3();
 const pos = new THREE.Vector3();
 
-function createCube (x,y) {
+function createSquare (x,y) {
     vec.set(
         ( x/ window.innerWidth ) * 2 - 1,
         - ( y / window.innerHeight ) * 2 + 1,
@@ -66,35 +66,49 @@ function createCube (x,y) {
     let distance = - camera.position.z / vec.z;
 
     pos.copy( camera.position ).add( vec.multiplyScalar( distance ) );
-    let sphere = new THREE.Mesh( geometry, material);
+    let square = new THREE.Mesh( geometry, material);
 
-    sphere.position.set(pos.x,pos.y,pos.z);
-    group.add(sphere);
+    square.position.set(pos.x,pos.y,pos.z);
+    
+    currentGroup.add( square );
 }
-
+let array
 let pressed = false;
 let first = [null,null];
 let last = [null,null];
+let first2 = [null,null];
+let last2 = [null,null];
 let mousePos;
+let currentGroup;
 function onPointerMove( event ) {
     mousePos = [event.pageX, event.pageY];
     if (pressed == false) {
         return;
     };
-
-    createCube(event.pageX,event.pageY);
+    last2 = mousePos;
+    let steps = Math.abs(last2[0]-first2[0]) + Math.abs(last2[1]-first2[1]);
+    steps = Math.ceil(steps/4);
+    let points = [(last2[0]-first2[0])/steps,(last2[1]-first2[1])/steps]
+        
+    for (let k=0; k<steps; k++) {
+        createSquare(first2[0] + (points[0]*k), first2[1] + (points[1]*k))
+    }
+    first2 = mousePos;
+    last2 = [null,null];
 }
 function onPointerDown( event ) {
     pressed = true;
-
-    
+    first2 = mousePos;
+    currentGroup = new THREE.Group();
+    mainGroup.add(currentGroup);
+    createSquare(event.pageX, event.pageY);
 }
 function onPointerUp( event ) {
     pressed = false;
 }
 function onEscapePressed( event) {
     if (event.code == "Escape") {
-        group.clear();
+        mainGroup.clear();
     };
 }
 
@@ -110,19 +124,26 @@ function onLPressed ( event ) {
     }
     let steps = Math.abs(last[0]-first[0]) + Math.abs(last[1]-first[1]);
     steps = Math.ceil(steps/4);
-    console.log(steps);
     let points = [(last[0]-first[0])/steps,(last[1]-first[1])/steps]
         
     for (let k=0; k<steps; k++) {
-        createCube(first[0] + (points[0]*k), first[1] + (points[1]*k))
+
+        createSquare(first[0] + (points[0]*k), first[1] + (points[1]*k))
     }
     first = [null,null];
     last = [null,null];
+}
+
+function Undo( event) {
+    if (event.ctrlKey && event.key === 'z') {
+        mainGroup.remove(mainGroup.children[mainGroup.children.length-1]);
+    }
 }
 window.addEventListener( 'pointermove', onPointerMove );
 window.addEventListener( 'pointerdown', onPointerDown );
 window.addEventListener( 'pointerup', onPointerUp );
 window.addEventListener( 'keydown', onEscapePressed );
 window.addEventListener( 'keydown', onLPressed);
+window.addEventListener( 'keydown', Undo );
 
 render();
