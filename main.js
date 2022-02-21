@@ -72,7 +72,7 @@ function createSquare (x,y) {
     
     currentGroup.add( square );
 }
-let array
+
 let pressed = false;
 let first = [null,null];
 let last = [null,null];
